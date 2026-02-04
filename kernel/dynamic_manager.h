@@ -43,7 +43,4 @@ bool ksu_load_dynamic_manager(void);
 bool ksu_is_dynamic_manager_enabled(void);
 apk_sign_key_t ksu_get_dynamic_manager_sign(void);
 
-// Configuration access for signature verification
-bool ksu_get_dynamic_manager_config(unsigned int *size, const char **hash);
-
 #endif
