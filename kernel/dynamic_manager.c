@@ -48,45 +48,6 @@ apk_sign_key_t ksu_get_dynamic_manager_sign(void)
     return sign_key;
 }
 
-static void do_track_throne(struct callback_head *work)
-{
-    const struct cred *saved = override_creds(ksu_cred);
-
-    track_throne(false);
-    revert_creds(saved);
-    kfree(work);
-}
-
-static bool start_track_throne(void)
-{
-    struct task_struct *tsk;
-    struct callback_head *cb;
-    unsigned long flags;
-
-    tsk = get_pid_task(find_vpid(1), PIDTYPE_PID);
-    if (!tsk) {
-        pr_err("track_throne find init task err\n");
-        return false;
-    }
-
-    cb = kzalloc(sizeof(*cb), GFP_KERNEL);
-    if (!cb) {
-        pr_err("track_throne alloc cb err\n");
-        goto put_task;
-    }
-
-    cb->func = do_track_throne;
-#if LINUX_VERSION_CODE >= KERNEL_VERSION(5, 10, 0)
-    task_work_add(tsk, cb, TWA_RESUME);
-#else
-    task_work_add(tsk, cb, true);
-#endif
-
-put_task:
-    put_task_struct(tsk);
-    return true;
-}
-
 int ksu_handle_dynamic_manager(struct ksu_dynamic_manager_cmd *cmd)
 {
     unsigned long flags;
@@ -101,11 +62,6 @@ int ksu_handle_dynamic_manager(struct ksu_dynamic_manager_cmd *cmd)
     case DYNAMIC_MANAGER_OP_SET:
         if (cmd->size < 0x100 || cmd->size > 0x1000) {
             pr_err("invalid size: 0x%x\n", cmd->size);
-            return -EINVAL;
-        }
-
-        if (strlen(cmd->hash) != 64) {
-            pr_err("invalid hash length: %zu\n", strlen(cmd->hash));
             return -EINVAL;
         }
 
@@ -131,7 +87,7 @@ int ksu_handle_dynamic_manager(struct ksu_dynamic_manager_cmd *cmd)
 #endif
         dynamic_manager.is_set = 1;
 
-        start_track_throne();
+        track_throne(false);
         pr_info(
             "dynamic manager updated: size=0x%x, hash=%.16s... (multi-manager enabled)\n",
             cmd->size, cmd->hash);
@@ -149,6 +105,11 @@ int ksu_handle_dynamic_manager(struct ksu_dynamic_manager_cmd *cmd)
         } else {
             ret = -ENODATA;
         }
+        break;
+    case DYNAMIC_MANAGER_OP_WIPE:
+        dynamic_manager.is_set = 0;
+        ret = 0;
+        pr_info("dynamic manager kernel settings reseted");
         break;
 
     default:
