@@ -4,6 +4,7 @@ import android.app.ActivityManager
 import android.os.Build
 import android.os.Bundle
 import android.webkit.WebView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -21,8 +22,10 @@ import com.dergoogler.mmrl.webui.model.WebUIConfig
 import com.dergoogler.mmrl.webui.screen.WebUIScreen
 import com.dergoogler.mmrl.webui.util.rememberWebUIOptions
 import com.resukisu.resukisu.BuildConfig
+import com.resukisu.resukisu.R
 import com.resukisu.resukisu.ksuApp
 import com.resukisu.resukisu.ui.theme.KernelSUTheme
+import com.resukisu.resukisu.ui.viewmodel.ModuleViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -55,6 +58,34 @@ class WebUIXActivity : ComponentActivity() {
         setContent {
             KernelSUTheme {
                 var isLoading by remember { mutableStateOf(true) }
+
+                LaunchedEffect(Unit) {
+                    val viewModel = ModuleViewModel()
+                    if (viewModel.moduleList.isEmpty()) {
+                        viewModel.fetchModuleList()
+                    }
+
+                    val moduleInfo = viewModel.moduleList.find { info -> info.id == moduleId }
+
+                    if (moduleInfo == null) {
+                        Toast.makeText(
+                            this@WebUIXActivity,
+                            getString(R.string.no_such_module, moduleId),
+                            Toast.LENGTH_LONG
+                        ).show()
+                        finish()
+                        return@LaunchedEffect
+                    }
+
+                    if (!moduleInfo.hasWebUi || !moduleInfo.enabled || moduleInfo.update || moduleInfo.remove) {
+                        Toast.makeText(
+                            this@WebUIXActivity,
+                            getString(R.string.module_unavailable, moduleInfo.name),
+                            Toast.LENGTH_LONG
+                        ).show()
+                        finish()
+                    }
+                }
 
                 LaunchedEffect(Platform.isAlive) {
                     while (!Platform.isAlive) {
