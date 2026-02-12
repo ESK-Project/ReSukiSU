@@ -2,6 +2,8 @@
 set -eu
 
 GKI_ROOT=$(pwd)
+OWNER="ESK-Project"
+REPO="ReSukiSU"
 
 display_usage() {
 	echo "Usage: $0 [--cleanup | <commit-or-tag>]"
@@ -41,7 +43,7 @@ setup_kernelsu() {
 	echo "[+] Setting up KernelSU..."
 	# Clone the repository and rename it to KernelSU
 	if [ ! -d "$GKI_ROOT/KernelSU" ]; then
-		git clone https://github.com/ReSukiSU/ReSukiSU KernelSU
+		git clone https://github.com/$OWNER/$REPO KernelSU
 		echo "[+] Repository cloned."
 	fi
 	cd "$GKI_ROOT/KernelSU"
