@@ -26,6 +26,19 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: install clang-format 21
+        run: |
+          curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key \
+            | sudo tee /etc/apt/trusted.gpg.d/apt.llvm.org.asc >/dev/null
+          echo "deb https://apt.llvm.org/noble/ llvm-toolchain-noble-21 main" \
+            | sudo tee /etc/apt/sources.list.d/llvm.list >/dev/null
+
+          sudo apt-get update
+          sudo apt-get install -y clang-format-21
+
+          sudo ln -sf /usr/bin/clang-format-21 /usr/local/bin/clang-format
+          clang-format --version
+
       - name: check
         working-directory: kernel
         run: make check-format
