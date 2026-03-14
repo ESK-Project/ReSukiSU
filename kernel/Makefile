@@ -15,7 +15,7 @@ compdb:
 clean:
 	make -C $(KDIR) M=$(MDIR) clean
 format:
-	find . \( -name "*.c" -o -name "*.h" \) -print0 | xargs -0 clang-format -i
+	find . \( -name "*.c" -o -name "*.h" \) -print0 | xargs -0 clang-format-18 -i
 check-format:
 	find . \( -name "*.c" -o -name "*.h" \) -print0 | xargs -0 clang-format --dry-run --Werror
 
