@@ -151,11 +151,11 @@ struct ksu_enable_kpm_cmd {
 
 #ifdef CONFIG_KSU_MULTI_MANAGER_SUPPORT
 struct ksu_get_hook_mode_cmd {
-	char mode[16];
+    char mode[16];
 };
 
 struct ksu_get_version_tag_cmd {
-	char tag[32];
+    char tag[32];
 };
 #endif
 
