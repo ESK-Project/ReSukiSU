@@ -5,7 +5,6 @@ use std::path::PathBuf;
 
 use log::{LevelFilter, error, info};
 
-#[cfg(all(target_arch = "aarch64", target_os = "android"))]
 use crate::android::susfs;
 use crate::{
     android::{
@@ -58,7 +57,6 @@ enum Commands {
         post_magica: bool,
     },
 
-    #[cfg(all(target_arch = "aarch64", target_os = "android"))]
     /// Manage susfs component
     Susfs {
         #[command(subcommand)]
@@ -460,6 +458,7 @@ enum Kernel {
     /// Notify that module is mounted
     NotifyModuleMounted,
 }
+
 #[derive(clap::Subcommand, Debug)]
 enum DynamicManagerOp {
     /// Get the signature of the current dynamic manager (size+hash)
@@ -527,7 +526,6 @@ mod kpm_cmd {
     }
 }
 
-#[cfg(all(target_arch = "aarch64", target_os = "android"))]
 #[derive(clap::Subcommand, Debug)]
 enum Susfs {
     /// Get SUSFS Status
@@ -566,7 +564,6 @@ pub fn run() -> Result<()> {
             init_event::on_boot_completed();
             Ok(())
         }
-        #[cfg(all(target_arch = "aarch64", target_os = "android"))]
         Commands::Susfs { command } => {
             match command {
                 Susfs::Version => println!("{}", susfs::get_susfs_version()),
