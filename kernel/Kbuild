@@ -95,9 +95,10 @@ $(info -- $(REPO_NAME) version name: $(KSU_VERSION_FULL))
 
 ccflags-y += -DKSU_VERSION=$(KSU_VERSION)
 ccflags-y += -DKSU_VERSION_FULL=\"$(KSU_VERSION_FULL)\"
+ccflags-y += -DKSU_VERSION_TAG=\"$(KSU_TAG_NAME)\"
 
 ifdef CONFIG_KSU_MULTI_MANAGER_SUPPORT
-$(info -- Supported Unofficial Manager: MKSU, RKSU, KOWSU, SukiSU-Ultra, ReSukiSU )
+$(info -- Supported Unofficial Manager: MKSU, RKSU, KOWSU, SukiSU-Ultra, ReSukiSU, MamboSU, KernelSU Next )
 endif
 
 KERNEL_VERSION := $(VERSION).$(PATCHLEVEL)
